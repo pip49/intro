@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - Intro</title>
+    <title>접속 안내 - My Personal Server</title>
     <style>
         body {
             display: flex;
@@ -12,45 +12,72 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: 'Pretendard', sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: #ffffff;
             color: #333;
-        }
-        .container {
             text-align: center;
+        }
+        .status-container {
+            padding: 20px;
         }
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
         @keyframes spin {
-            0% { transform: rotate(0)deg; }
+            0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        h1 { font-size: 1.5rem; margin-bottom: 10px; }
+        p { color: #666; }
+        .off-time { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>반갑습니다!</h1>
-        <p>잠시 후 개인 서버로 연결됩니다.</p>
+    <div id="content" class="status-container">
+        <h1>서버 연결 확인 중</h1>
+        <p>잠시만 기다려주세요...</p>
         <div class="loader"></div>
-        <p><small>이동하지 않는다면 <a href="https://your-server-url.com">여기</a>를 클릭하세요.</small></p>
     </div>
 
     <script>
-        // 이동할 대상 주소를 입력하세요
-        const targetUrl = "https://your-server-url.com";
+        // 1. 실제 본인의 서버 IP와 포트로 수정하세요.
+        const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
-        // 3초(3000ms) 후에 페이지 이동
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 3000);
+        // 2. 서버 체크 로직
+        // fetch의 timeout을 대비해 약간의 대기 시간을 가집니다.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 동안 응답 없으면 실패로 간주
+
+        fetch(myServerIp, {
+            mode: 'no-cors',
+            signal: controller.signal
+        })
+        .then(() => {
+            // 서버가 살아있을 때
+            clearTimeout(timeoutId);
+            window.location.href = myServerIp;
+        })
+        .catch((error) => {
+            // 서버가 꺼져 있거나 연결 오류 시
+            console.log("Server is offline", error);
+            renderOfflineMessage();
+        });
+
+        // 오프라인 메시지 출력 함수
+        function renderOfflineMessage() {
+            document.getElementById('content').innerHTML = `
+                <h1 class="off-time">현재는 운영시간이 아닙니다.</h1>
+                <p>서버 가동 시간: <strong>09:00 ~ 18:00</strong></p>
+                <p style="font-size: 0.9rem; color: #999;">이후 시간에 다시 접속해 주세요.</p>
+            `;
+        }
     </script>
 </body>
 </html>
