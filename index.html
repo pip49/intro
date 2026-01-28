@@ -51,6 +51,17 @@
         const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
             window.location.href = myServerIp;
+
+// 2. 만약 서버가 꺼져서 페이지가 안 넘어가고 이 페이지에 머물러 있다면,
+    // 5초 후에 아래 안내 멘트를 화면에 띄웁니다.
+    setTimeout(() => {
+        document.getElementById('content').innerHTML = `
+            <h1 style="color: #e74c3c;">서버 접속 불가</h1>
+            <p>현재 서버가 꺼져 있거나 점검 중입니다.</p>
+            <p class="off-time">운영 시간을 확인해 주세요 (09:00~22:00)</p>
+            <button onclick="location.reload()" style="padding: 10px;">다시 시도하기</button>
+        `;
+    }, 5000);
     </script>
 </body>
 </html>
