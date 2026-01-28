@@ -16,99 +16,79 @@
             background: var(--bg-overlay); width: 90%; max-width: 500px; padding: 30px;
             border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
         }
-        .status-badge { background: #95a5a6; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
+        .status-badge { background: #e74c3c; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
         .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .gallery img { width: 100%; border-radius: 8px; transition: 0.3s; }
+        .gallery img { width: 100%; border-radius: 8px; }
         .audio-player { background: #eee; padding: 15px; border-radius: 10px; margin-top: 15px; }
         audio { width: 100%; }
-        .timer-display { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin: 15px 0; display: none; }
-        .btn-retry { margin-top: 10px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .timer-text { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
+        .btn-retry { margin-top: 20px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .off-info { font-size: 0.85rem; color: #666; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="main-card">
-    <span id="badge" class="status-badge">접속 확인 중...</span>
-    <h1 style="margin:5px 0;">Welcome to pip49</h1>
-    <p id="info-text">서버 상태를 확인하고 있습니다.</p>
-
-    <div class="gallery">
-        <img src="https://pip49.github.io/intro/1.jpg" alt="1">
-        <img src="https://pip49.github.io/intro/2.jpg" alt="2">
-        <img src="https://pip49.github.io/intro/3.jpg" alt="3">
+<div class="main-card" id="main-content">
+    <div id="loading-area">
+        <h1>서버 접속 중...</h1>
+        <p>잠시 후 개인 서버로 이동합니다.</p>
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
     </div>
-
-    <div class="audio-player">
-        <p>🎵 음악 샘플 미리듣기</p>
-        <audio controls><source src="https://pip49.github.io/intro/1.mp3" type="audio/mpeg"></audio>
-    </div>
-
-    <div id="timer-area" class="timer-display">
-        <span id="timer">05:00</span> 후 서버로 자동 이동합니다.
-    </div>
-
-    <div style="font-size:0.85rem; color:#666; margin-top:15px;">
-        🕒 <b>운영 시간:</b> 09:00 ~ 22:00
-    </div>
-    <button class="btn-retry" onclick="location.reload()">다시 확인</button>
 </div>
 
 <script>
-    // 1. 실제 접속할 서버 주소
     const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
-    // 2. [중요] 서버의 '생사'를 확인할 주소입니다.
-    // 서버가 켜져 있을 때 확실히 응답을 줄 수 있는 주소(CGI 주소 그대로 써도 무방)를 넣습니다.
-    const checkUrl = myServerIp;
+    // 1. 실행하자마자 즉시 서버 이동 시도 (서버가 켜져 있으면 여기서 끝남)
+    window.location.href = myServerIp;
 
-    const badge = document.getElementById('badge');
-    const infoText = document.getElementById('info-text');
-    const timerArea = document.getElementById('timer-area');
-    const timerElement = document.getElementById('timer');
+    // 2. 만약 서버가 꺼져 있어서 3초 후에도 이 페이지에 머물러 있다면 아래 내용 실행
+    setTimeout(() => {
+        document.getElementById('main-content').innerHTML = `
+            <span class="status-badge">서버 점검 중</span>
+            <h1>Welcome to pip49</h1>
+            <p>서버가 응답하지 않아 홍보 페이지로 전환되었습니다.</p>
 
-    // 서버 체크 로직
-    const img = new Image();
+            <div class="gallery">
+                <img src="https://pip49.github.io/intro/1.jpg" alt="S1">
+                <img src="https://pip49.github.io/intro/2.jpg" alt="S2">
+                <img src="https://pip49.github.io/intro/3.jpg" alt="S3">
+            </div>
 
-    // 서버가 응답을 하면 (켜져 있으면) 즉시 이동
-    img.onload = img.onerror = function(e) {
-        // HTTP 서버 특성상 이미지가 아니더라도 응답(에러 포함)이 오면 서버가 켜진 것으로 봅니다.
-        // 완전히 꺼져있을 때(네트워크 불능)와 구별하기 위해 2초 정도만 기다립니다.
-        badge.innerText = "서버 온라인";
-        badge.style.background = "#2ecc71";
-        infoText.innerText = "서버가 확인되었습니다. 이동합니다!";
+            <div class="audio-player">
+                <p>🎵 미리보기 음원 감상</p>
+                <audio controls><source src="https://pip49.github.io/intro/1.mp3" type="audio/mpeg"></audio>
+            </div>
 
-        setTimeout(() => {
-            window.location.href = myServerIp;
-        }, 1000);
-    };
+            <div class="timer-text">
+                <span id="timer">05:00</span> 후 자동으로 다시 접속합니다.
+            </div>
 
-    // 만약 3초 동안 아무런 응답이 없으면 서버가 꺼진 것으로 간주하고 5분 카운트다운 시작
-    const timeout = setTimeout(() => {
-        img.onload = img.onerror = null; // 이벤트 제거
-        startCountdown();
-    }, 3000);
+            <div class="off-info">🕒 <b>운영 시간:</b> 09:00 ~ 22:00</div>
+            <button class="btn-retry" onclick="location.reload()">즉시 다시 시도</button>
+        `;
 
-    img.src = checkUrl + "?t=" + new Date().getTime();
+        startTimer();
+    }, 3000); // 3초의 여유를 주고 체크
 
-    function startCountdown() {
-        badge.innerText = "서버 오프라인";
-        badge.style.background = "#e74c3c";
-        infoText.innerText = "현재 서버 점검 중입니다. 홍보 자료를 감상해 보세요.";
-        timerArea.style.display = "block";
+    function startTimer() {
+        let timeLeft = 300; // 5분
+        const timerElement = document.getElementById('timer');
 
-        let totalSeconds = 300;
         const countdown = setInterval(() => {
-            totalSeconds--;
-            let min = Math.floor(totalSeconds / 60);
-            let sec = totalSeconds % 60;
+            timeLeft--;
+            let min = Math.floor(timeLeft / 60);
+            let sec = timeLeft % 60;
             timerElement.innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-            if (totalSeconds <= 0) {
+
+            if (timeLeft <= 0) {
                 clearInterval(countdown);
-                window.location.href = myServerIp;
+                window.location.href = myServerIp; // 5분 뒤 재접속 시도
             }
         }, 1000);
     }
 </script>
 
+<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
