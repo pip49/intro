@@ -50,34 +50,7 @@
         // 1. 실제 본인의 서버 IP와 포트로 수정하세요.
         const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
-        // 2. 서버 체크 로직
-        // fetch의 timeout을 대비해 약간의 대기 시간을 가집니다.
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 동안 응답 없으면 실패로 간주
-
-        fetch(myServerIp, {
-            mode: 'no-cors',
-            signal: controller.signal
-        })
-        .then(() => {
-            // 서버가 살아있을 때
-            clearTimeout(timeoutId);
             window.location.href = myServerIp;
-        })
-        .catch((error) => {
-            // 서버가 꺼져 있거나 연결 오류 시
-            console.log("Server is offline", error);
-            renderOfflineMessage();
-        });
-
-        // 오프라인 메시지 출력 함수
-        function renderOfflineMessage() {
-            document.getElementById('content').innerHTML = `
-                <h1 class="off-time">현재는 운영시간이 아닙니다.</h1>
-                <p>서버 가동 시간: <strong>09:00 ~ 18:00</strong></p>
-                <p style="font-size: 0.9rem; color: #999;">이후 시간에 다시 접속해 주세요.</p>
-            `;
-        }
     </script>
 </body>
 </html>
