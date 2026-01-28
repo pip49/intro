@@ -6,24 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pip49 개인 서버 안내</title>
     <style>
-        :root { --primary-color: #3498db; --bg-overlay: rgba(255, 255, 255, 0.9); }
+        :root { --primary-color: #3498db; }
+
         body {
             margin: 0; font-family: 'Pretendard', sans-serif;
+            /* 배경 이미지 설정 */
             background: url('https://pip49.github.io/intro/bg.jpg') no-repeat center center fixed;
-            background-size: cover; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-size: cover;
+            color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
+
         .main-card {
-            background: var(--bg-overlay); width: 90%; max-width: 500px; padding: 30px;
-            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+            /* [수정] 배경 투명도를 0.4로 낮춰서 뒤의 bg.jpg가 잘 보이게 했습니다 */
+            background: rgba(255, 255, 255, 0.4);
+            /* [추가] 글자가 잘 보이도록 배경을 살짝 흐리게 처리 */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            width: 90%; max-width: 480px; padding: 30px;
+            border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.3);
         }
+
         .status-badge { background: #e74c3c; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
         .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .gallery img { width: 100%; border-radius: 8px; }
-        .audio-player { background: #eee; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .gallery img { width: 100%; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); }
+
+        /* 오디오 플레이어 배경도 투명하게 조절 */
+        .audio-player { background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 15px; margin-top: 15px; }
         audio { width: 100%; }
-        .timer-text { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
-        .btn-retry { margin-top: 20px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .off-info { font-size: 0.85rem; color: #666; margin-top: 15px; }
+
+        .timer-text { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin: 15px 0; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+        .btn-retry { margin-top: 20px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-retry:hover { background: #2980b9; transform: scale(1.05); }
+        .off-info { font-size: 0.9rem; color: #222; margin-top: 15px; font-weight: bold; }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -32,22 +50,23 @@
     <div id="loading-area">
         <h1>서버 접속 중...</h1>
         <p>잠시 후 개인 서버로 이동합니다.</p>
-        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
+        <div style="border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
     </div>
 </div>
 
 <script>
     const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
-    // 1. 실행하자마자 즉시 서버 이동 시도 (서버가 켜져 있으면 여기서 끝남)
+    // 1. 접속 즉시 이동 시도 (서버가 켜져 있으면 여기서 끝남)
     window.location.href = myServerIp;
 
-    // 2. 만약 서버가 꺼져 있어서 3초 후에도 이 페이지에 머물러 있다면 아래 내용 실행
+    // 2. 서버가 꺼져 있어서 이동하지 못하고 이 페이지에 머물 경우 3초 뒤 화면 전환
     setTimeout(() => {
-        document.getElementById('main-content').innerHTML = `
+        const content = document.getElementById('main-content');
+        content.innerHTML = `
             <span class="status-badge">서버 점검 중</span>
-            <h1>Welcome to pip49</h1>
-            <p>서버가 응답하지 않아 홍보 페이지로 전환되었습니다.</p>
+            <h1 style="margin:5px 0;">Welcome to pip49</h1>
+            <p style="font-weight:500;">서버 연결 대기 중입니다. 샘플을 구경해 보세요!</p>
 
             <div class="gallery">
                 <img src="https://pip49.github.io/intro/1.jpg" alt="S1">
@@ -56,20 +75,20 @@
             </div>
 
             <div class="audio-player">
-                <p>🎵 미리보기 음원 감상</p>
+                <p style="margin:0 0 10px 0; font-weight:bold;">🎵 미리보기 음원 감상</p>
                 <audio controls><source src="https://pip49.github.io/intro/1.mp3" type="audio/mpeg"></audio>
             </div>
 
             <div class="timer-text">
-                <span id="timer">05:00</span> 후 자동으로 다시 접속합니다.
+                <span id="timer">05:00</span> 후 다시 접속을 시도합니다.
             </div>
 
-            <div class="off-info">🕒 <b>운영 시간:</b> 09:00 ~ 22:00</div>
+            <div class="off-info">🕒 운영 시간: 09:00 ~ 22:00</div>
             <button class="btn-retry" onclick="location.reload()">즉시 다시 시도</button>
         `;
 
         startTimer();
-    }, 3000); // 3초의 여유를 주고 체크
+    }, 3000);
 
     function startTimer() {
         let timeLeft = 300; // 5분
@@ -79,16 +98,18 @@
             timeLeft--;
             let min = Math.floor(timeLeft / 60);
             let sec = timeLeft % 60;
-            timerElement.innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+
+            if(timerElement) {
+                timerElement.innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+            }
 
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                window.location.href = myServerIp; // 5분 뒤 재접속 시도
+                window.location.href = myServerIp; // 5분 뒤 재시도
             }
         }, 1000);
     }
 </script>
 
-<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
