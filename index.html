@@ -4,64 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>접속 안내 - My Personal Server</title>
+    <title>pip49 개인 서버 안내</title>
     <style>
+        :root { --primary-color: #3498db; --bg-overlay: rgba(255, 255, 255, 0.9); }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Pretendard', -apple-system, sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            text-align: center;
+            margin: 0; font-family: 'Pretendard', sans-serif;
+            background: url('https://pip49.github.io/intro/bg.jpg') no-repeat center center fixed;
+            background-size: cover; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-        .status-container {
-            padding: 20px;
+        .main-card {
+            background: var(--bg-overlay); width: 90%; max-width: 500px; padding: 30px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
         }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        h1 { font-size: 1.5rem; margin-bottom: 10px; }
-        p { color: #666; }
-        .off-time { color: #e74c3c; font-weight: bold; }
+        .status-badge { background: #e74c3c; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
+        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .gallery img { width: 100%; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .gallery img:hover { transform: scale(1.05); }
+        .audio-player { background: #eee; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .audio-player p { margin: 0 0 10px 0; font-size: 0.9rem; font-weight: bold; }
+        audio { width: 100%; }
+        .btn-retry { margin-top: 20px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .off-info { font-size: 0.85rem; color: #666; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="content" class="status-container">
-        <h1>서버 연결 확인 중</h1>
-        <p>잠시만 기다려주세요...</p>
-        <div class="loader"></div>
+<div class="main-card" id="main-content">
+    <div id="loading-state">
+        <h1>서버 연결 시도 중</h1>
+        <p>잠시 후 개인 서버로 이동합니다...</p>
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
     </div>
+</div>
 
-    <script>
-        // 1. 실제 본인의 서버 IP와 포트로 수정하세요.
-        const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
+<script>
+    const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
 
-            window.location.href = myServerIp;
+    // 1. 즉시 이동 시도
+    window.location.href = myServerIp;
 
-// 2. 만약 서버가 꺼져서 페이지가 안 넘어가고 이 페이지에 머물러 있다면,
-    // 5초 후에 아래 안내 멘트를 화면에 띄웁니다.
+    // 2. 5초 후에도 이동이 안 되었을 때 (서버 오프라인) 보여줄 홍보 페이지
     setTimeout(() => {
-        document.getElementById('content').innerHTML = `
-            <h1 style="color: #e74c3c;">서버 접속 불가</h1>
-            <p>현재 서버가 꺼져 있거나 점검 중입니다.</p>
-            <p class="off-time">운영 시간을 확인해 주세요 (09:00~22:00)</p>
-            <button onclick="location.reload()" style="padding: 10px;">다시 시도하기</button>
+        document.getElementById('main-content').innerHTML = `
+            <span class="status-badge">현재 서버 점검 중</span>
+            <h1 style="margin:5px 0;">Welcome to pip49</h1>
+            <p>서버 운영시간 외에는 여기서 샘플을 확인하세요.</p>
+
+            <div class="gallery">
+                <img src="https://pip49.github.io/intro/1.jpg" alt="Sample 1">
+                <img src="https://pip49.github.io/intro/2.jpg" alt="Sample 2">
+                <img src="https://pip49.github.io/intro/3.jpg" alt="Sample 3">
+            </div>
+
+            <div class="audio-player">
+                <p>🎵 음악 샘플 미리듣기</p>
+                <audio controls>
+                    <source src="https://pip49.github.io/intro/1.mp3" type="audio/mpeg">
+                    브라우저가 오디오를 지원하지 않습니다.
+                </audio>
+            </div>
+
+            <div class="off-info">
+                🕒 <b>운영 시간:</b> 09:00 ~ 22:00<br>
+                문의: your-email@example.com
+            </div>
+
+            <button class="btn-retry" onclick="location.reload()">다시 접속 시도</button>
         `;
     }, 5000);
-    </script>
+</script>
+
+<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
