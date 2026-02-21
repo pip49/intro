@@ -11,50 +11,70 @@
             margin: 0; font-family: 'Pretendard', sans-serif;
             background: url('https://pip49.github.io/intro/bg.jpg') no-repeat center center fixed;
             background-size: cover;
-            color: #fff; /* 배경이 잘 보이도록 기본 글자색을 흰색으로 변경 */
+            color: #fff;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .main-card {
-            /* [수정] 배경을 완전히 투명하게 설정 */
             background: transparent;
             width: 90%; max-width: 500px; padding: 30px;
             text-align: center;
-            /* 배경 위에서 글자가 잘 보이도록 그림자 효과 추가 */
             text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
         }
         .status-badge { background: #e74c3c; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; text-shadow: none; }
         .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
         .gallery img { width: 100%; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); }
-        /* 오디오 플레이어는 조작을 위해 약간의 반투명 배경 유지 */
         .audio-player { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; margin-top: 15px; }
         audio { width: 100%; }
         .timer-text { color: #ff4d4d; font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
         .btn-retry { margin-top: 20px; padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-shadow: none; }
         .off-info { font-size: 0.85rem; color: #eee; margin-top: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="main-card" id="main-content">
     <div id="loading-area">
-        <h1>서버 접속 중...</h1>
+        <h1 id="loading-title">서버 접속 중...</h1>
         <p>잠시 후 개인 서버로 이동합니다.</p>
         <div style="border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
     </div>
 </div>
 
 <script>
-    const myServerIp = "http://125.251.58.88:49494/cgi-bin/D.cgi";
+    // URL에서 ?site=... 값을 읽어옵니다.
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteType = urlParams.get('site');
 
-    // 1. 실행하자마자 즉시 서버 이동 시도
-    window.location.href = myServerIp;
+    // 접속할 4가지 주소 설정
+    const serverMap = {
+        "default": "http://125.251.58.88:49494/cgi-bin/D.cgi",
+        "store2": "http://125.251.58.88:49494/cgi-bin/storefront.cgi?action=detail&id=2",
+        "product": "http://125.251.58.88:49494/cgi-bin/product_list.cgi?action=detail&item_id=1001",
+        "store3": "http://125.251.58.88:49494/cgi-bin/storefront.cgi?action=detail&id=3"
+    };
 
-    // 2. 만약 서버가 꺼져 있어서 3초 후에도 이 페이지에 머물러 있다면 아래 내용 실행
+    // 현재 접속하려는 목적지 주소 결정
+    const targetUrl = serverMap[siteType] || serverMap["default"];
+
+    // 화면 제목 변경 (예: 스토어 접속 중...)
+    if(siteType === "store2" || siteType === "store3") document.getElementById('loading-title').innerText = "스토어 접속 중...";
+    if(siteType === "product") document.getElementById('loading-title').innerText = "상품 페이지 접속 중...";
+
+    // 1. 서버 이동 시도
+    window.location.href = targetUrl;
+
+    // 2. 서버가 꺼져 있어 3초 후에도 응답이 없을 때 보여줄 화면
     setTimeout(() => {
+        let displayMessage = "서버가 응답하지 않아 홍보 페이지로 전환되었습니다.";
+        if(siteType === "store2") displayMessage = "스토어(ID:2) 서버 점검으로 홍보 페이지를 보여드립니다.";
+        if(siteType === "product") displayMessage = "상품 페이지 서버 점검으로 홍보 페이지를 보여드립니다.";
+        if(siteType === "store3") displayMessage = "스토어(ID:3) 서버 점검으로 홍보 페이지를 보여드립니다.";
+
         document.getElementById('main-content').innerHTML = `
             <span class="status-badge">서버 점검 중</span>
             <h1>Welcome to pip49</h1>
-            <p>서버가 응답하지 않아 홍보 페이지로 전환되었습니다.</p>
+            <p>${displayMessage}</p>
 
             <div class="gallery">
                 <img src="https://pip49.github.io/intro/1.jpg" alt="S1">
@@ -81,7 +101,6 @@
     function startTimer() {
         let timeLeft = 300;
         const timerElement = document.getElementById('timer');
-
         const countdown = setInterval(() => {
             timeLeft--;
             let min = Math.floor(timeLeft / 60);
@@ -89,15 +108,12 @@
             if (timerElement) {
                 timerElement.innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
             }
-
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                window.location.href = myServerIp;
+                window.location.href = targetUrl;
             }
         }, 1000);
     }
 </script>
-
-<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
