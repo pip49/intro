@@ -42,38 +42,27 @@
 </div>
 
 <script>
-    // URL에서 ?site=... 값을 읽어옵니다.
     const urlParams = new URLSearchParams(window.location.search);
     const siteType = urlParams.get('site');
 
-    // 접속할 4가지 주소 설정
     const serverMap = {
         "default": "http://125.251.58.88:49494/cgi-bin/D.cgi",
         "store2": "http://125.251.58.88:49494/cgi-bin/storefront.cgi?action=detail&id=2",
         "product": "http://125.251.58.88:49494/cgi-bin/product_list.cgi?action=detail&item_id=1001",
         "store3": "http://125.251.58.88:49494/cgi-bin/storefront.cgi?action=detail&id=3",
-	    "txt": "http://125.251.58.88:49494/img/txt.html"
-	    "p002": "http://125.251.58.88:49494/cgi-bin/shop.cgi?id=P002"
+        "txt": "http://125.251.58.88:49494/img/txt.html", // 끝에 쉼표 추가 완료
+        "p002": "http://125.251.58.88:49494/cgi-bin/shop.cgi?id=P002"
     };
 
-    // 현재 접속하려는 목적지 주소 결정
     const targetUrl = serverMap[siteType] || serverMap["default"];
 
-    // 화면 제목 변경 (예: 스토어 접속 중...)
-    if(siteType === "store2" || siteType === "store3") document.getElementById('loading-title').innerText = "스토어 접속 중...";
-    if(siteType === "product") document.getElementById('loading-title').innerText = "상품 페이지 접속 중...";
-
-    // 1. 서버 이동 시도
+    // 접속 시도
     window.location.href = targetUrl;
 
-    // 2. 서버가 꺼져 있어 3초 후에도 응답이 없을 때 보여줄 화면
     setTimeout(() => {
-        let displayMessage = "서버가 응답하지 않아 홍보 페이지로 전환되었습니다.";
-        if(siteType === "store2") displayMessage = "스토어(ID:2) 서버 점검으로 홍보 페이지를 보여드립니다.";
-        if(siteType === "product") displayMessage = "상품 페이지 서버 점검으로 홍보 페이지를 보여드립니다.";
-        if(siteType === "store3") displayMessage = "스토어(ID:3) 서버 점검으로 홍보 페이지를 보여드립니다.";
-	if(siteType === "txt") displayMessage = "txt.html이 있는(존재하는) 서버는 현재 점검 중입니다.";
-	if(siteType === "p002") displayMessage = "1.html이 있는(존재하는) 서버는 현재 점검 중입니다.";
+        // 사이트 별명을 자동으로 가져와서 메시지에 넣음 (if문 수십 개 쓸 필요 없음)
+        const siteLabel = siteType ? siteType : "서버";
+        let displayMessage = `[${siteLabel}] 서버가 응답하지 않아 홍보 페이지로 전환되었습니다.`;
 
         document.getElementById('main-content').innerHTML = `
             <span class="status-badge">서버 점검 중</span>
